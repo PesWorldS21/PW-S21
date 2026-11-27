@@ -1,0 +1,159 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PES World Season 21 Standings</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout concept: stadium scoreboard. Read-only ranked rows with goals or points as the big number. */
+:root {
+  --bg: #eef1ec;
+  --surface: #ffffff;
+  --fg: #14201a;
+  --muted: #5b6a61;
+  --line: #d3dad2;
+  --turf: #1f5a3c;
+  --turf-ink: #ffffff;
+  --signal: #b57d00;
+  --chip: #e2e8e0;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Barlow", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1713; --surface: #172019; --fg: #e8eee9; --muted: #9db0a4; --line: #2a3a2f;
+    --turf: #3fa56e; --turf-ink: #07130c; --signal: #f0b429; --chip: #213027; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1713; --surface: #172019; --fg: #e8eee9; --muted: #9db0a4; --line: #2a3a2f;
+  --turf: #3fa56e; --turf-ink: #07130c; --signal: #f0b429; --chip: #213027; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+}
+.wrap { max-width: 860px; margin: 0 auto; }
+header.top { padding-block: 40px 18px; }
+.eyebrow { font-family: var(--font-display); font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--signal); font-size: 14px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(44px, 10vw, 88px); line-height: .92; margin: 6px 0 10px; text-transform: uppercase; text-wrap: balance; }
+.summary { color: var(--muted); margin: 0; font-variant-numeric: tabular-nums; }
+.summary b { color: var(--fg); font-weight: 600; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.bar-top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.tabs { display: flex; gap: 6px; flex-basis: 100%; }
+.tab { font: inherit; color: var(--fg); background: var(--chip); border: 0; border-radius: 999px; padding: 6px 18px; cursor: pointer; font-weight: 500; }
+.tab[aria-selected="true"] { background: var(--turf); color: var(--turf-ink); }
+input[type=search], select { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; min-width: 0; }
+input[type=search] { flex: 1 1 200px; }
+select { flex: 0 1 220px; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+ol.board { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; }
+.rank { font-family: var(--font-display); font-weight: 700; font-size: 36px; color: var(--muted); text-align: center; line-height: 1; font-variant-numeric: tabular-nums; }
+.item.podium .rank { color: var(--signal); }
+.item.leader { border-color: var(--signal); }
+.name { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1.05; text-transform: uppercase; overflow-wrap: anywhere; }
+.sub { color: var(--muted); font-size: 14px; }
+.meter { height: 5px; background: var(--chip); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--turf); }
+.goals { text-align: right; font-family: var(--font-display); }
+.goals b { display: block; font-size: 42px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.goals small { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.tag { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: var(--signal); color: var(--bg); border-radius: 4px; padding: 1px 7px; vertical-align: middle; margin-left: 6px; }
+.empty { color: var(--muted); padding: 32px 0; }
+.foot { margin-top: 36px; color: var(--muted); font-size: 14px; }
+@media (max-width: 520px) {
+  .item { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 10px; padding: 12px; }
+  .name { font-size: 22px; }
+  .goals b { font-size: 36px; }
+}
+@media (prefers-reduced-motion: no-preference) { .meter i { transition: width .35s ease; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Standings as of 27 Nov 2026</div>
+    <h1>PES World Season 21</h1>
+    <p class="summary" id="summary"></p>
+  </header>
+
+  <div class="bar-top">
+    <div class="tabs" role="tablist" aria-label="Leaderboard">
+      <button class="tab" role="tab" type="button" data-view="goals" aria-selected="true">Top scorers</button>
+      <button class="tab" role="tab" type="button" data-view="pts" aria-selected="false">Best player</button>
+    </div>
+    <input type="search" id="q" placeholder="Search a player or team" aria-label="Search players">
+    <select id="team" aria-label="Filter by team"><option value="">All teams</option></select>
+  </div>
+
+  <ol class="board" id="board"></ol>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const DATA = [["ZLATAN","COPRONYX NEMESIS",0,0,0,0],["ABHISHEK","COPRONYX NEMESIS",4,2,0,0],["NADEEM","COPRONYX NEMESIS",2,0,1,1],["TORVIN","COPRONYX NEMESIS",5,1,0,0],["JASEEL","COPRONYX NEMESIS",8,2,0,0],["HUZEFA","COPRONYX NEMESIS",4,1,0,1],["BAPPI","COPRONYX NEMESIS",0,0,0,0],["NAVEED","COPRONYX NEMESIS",3,1,0,0],["MUZAMMIL","COPRONYX NEMESIS",6,1,1,0],["UZAIR","COPRONYX NEMESIS",3,1,1,0],["MGC HISHAN","MGC ESPORTS",8,2,0,0],["MGC FARAS","MGC ESPORTS",5,1,0,1],["MGC AKHIL","MGC ESPORTS",0,0,0,0],["MGC FAIXO","MGC ESPORTS",2,0,1,1],["MGC BILLU","MGC ESPORTS",2,0,1,1],["MGC ABINSYAM","MGC ESPORTS",0,0,0,0],["MGC PABLO","MGC ESPORTS",6,1,0,1],["MGC ADWAITH","MGC ESPORTS",5,2,0,0],["MGC RASLEEF","MGC ESPORTS",0,0,0,0],["MGC YAYYAPPI","MGC ESPORTS",1,0,0,2],["NXG ASHKAR","NXG MIRACLES",0,0,0,0],["NXG STERO","NXG MIRACLES",8,1,1,0],["NXG PREDATOR","NXG MIRACLES",2,0,0,2],["NXG BLACK","NXG MIRACLES",0,0,0,0],["NXG_LORDONYX","NXG MIRACLES",0,0,0,0],["NXG DAEMON","NXG MIRACLES",6,2,0,0],["NXG WRONGER","NXG MIRACLES",3,1,0,1],["NXG HERO","NXG MIRACLES",2,0,1,1],["NXG ASHBIN","NXG MIRACLES",1,0,0,2],["NXG SREE","NXG MIRACLES",6,0,1,1],["DICTATOR","INVINCIBLE RANGERS CREW",0,0,0,1],["RIDIP","INVINCIBLE RANGERS CREW",0,0,0,1],["SHAHNAWAZ","INVINCIBLE RANGERS CREW",1,0,0,1],["DEADMAN","INVINCIBLE RANGERS CREW",1,0,0,2],["SINAN","INVINCIBLE RANGERS CREW",1,0,0,2],["SANTO","INVINCIBLE RANGERS CREW",8,2,0,0],["SAURAV","INVINCIBLE RANGERS CREW",0,0,0,1],["SANI","INVINCIBLE RANGERS CREW",5,1,1,0],["SAYAN","INVINCIBLE RANGERS CREW",0,0,0,1],["SAYANTAN","INVINCIBLE RANGERS CREW",0,0,0,1],["AFSAR","SUPREME-X",0,0,0,0],["SHABIN","SUPREME-X",0,0,0,0],["LOKI","SUPREME-X",3,1,0,1],["HISHAM","SUPREME-X",6,1,0,0],["SHIYAS","SUPREME-X",5,1,0,1],["VS7","SUPREME-X",4,2,0,0],["JIYAD","SUPREME-X",0,0,0,1],["FADIL","SUPREME-X",0,0,1,1],["ARKA","SUPREME-X",6,1,1,0],["SACHU","SUPREME-X",5,2,0,0],["CARTI","KFC NOOBIES",5,1,0,0],["TYLER","KFC NOOBIES",0,0,0,2],["PIRES","KFC NOOBIES",0,0,0,0],["AADI","KFC NOOBIES",1,0,0,1],["AMRITHESH","KFC NOOBIES",2,0,0,2],["KINGSLAYER","KFC NOOBIES",1,0,1,0],["BASAM","KFC NOOBIES",0,0,0,1],["KLAUS","KFC NOOBIES",2,1,0,1],["MILAN","KFC NOOBIES",0,0,1,1],["ABHINAND","KFC NOOBIES",4,1,0,1],["RASHID","PES LIGA",0,0,0,1],["MR OGGY","PES LIGA",1,0,0,2],["HIJAZ","PES LIGA",2,0,0,2],["RITHUL","PES LIGA",4,1,0,1],["AKSHAY","PES LIGA",3,1,0,0],["FAYIS","PES LIGA",6,0,1,1],["JITHIN","PES LIGA",2,0,1,1],["VAISHAK","PES LIGA",3,0,0,1],["RAZAL","PES LIGA",0,0,0,0],["SHEFEEK","PES LIGA",0,0,0,1],["TOBY","TM MAVERICKS",2,1,1,0],["AMAN","TM MAVERICKS",3,2,0,0],["AJAY","TM MAVERICKS",1,0,0,2],["NIHAM","TM MAVERICKS",2,1,0,1],["ASH","TM MAVERICKS",0,0,0,1],["ASWIN","TM MAVERICKS",0,0,0,0],["SID","TM MAVERICKS",1,0,0,1],["ATHUL","TM MAVERICKS",2,0,0,2],["ARUN","TM MAVERICKS",4,1,0,1],["NASNAS","TM MAVERICKS",0,0,0,0],["NUHMAN","PFCLIONS",5,1,0,1],["MR MONIES","PFCLIONS",2,1,0,0],["COLD PALMER","PFCLIONS",0,0,0,1],["MANU","PFCLIONS",0,0,0,1],["NEDVED","PFCLIONS",5,1,1,0],["SALAH","PFCLIONS",1,0,0,2],["BAD BOY","PFCLIONS",3,1,0,1],["DEVAN","PFCLIONS",0,0,0,1],["HYDER ALI","PFCLIONS",0,0,1,0],["KING KA","PFCLIONS",0,0,0,1],["PSM GALRO DX","PATRO SUPREMACY",0,0,1,1],["PSM AJJULL","PATRO SUPREMACY",1,1,0,1],["PSM VISHNU JR","PATRO SUPREMACY",0,0,0,0],["PSM MCBBOY","PATRO SUPREMACY",5,1,0,1],["PSM DEVAN","PATRO SUPREMACY",8,2,0,0],["PSM LEO","PATRO SUPREMACY",4,2,0,0],["PSM CARLO","PATRO SUPREMACY",4,1,1,0],["PSM MASK","PATRO SUPREMACY",2,0,0,1],["PSM GOAT","PATRO SUPREMACY",1,0,1,0],["PSM VYC","PATRO SUPREMACY",0,0,0,0],["RYUKEN","ZERO MERCY",3,1,1,0],["MAAZI","ZERO MERCY",0,0,0,0],["SANDY","ZERO MERCY",9,2,0,0],["BLAZE","ZERO MERCY",2,1,0,0],["ADHITHYAN","ZERO MERCY",0,0,0,1],["ANSU","ZERO MERCY",5,2,0,0],["SCOFIELD","ZERO MERCY",6,1,1,0],["LATEXO","ZERO MERCY",5,2,0,0],["DEV","ZERO MERCY",6,1,0,1],["SON","ZERO MERCY",0,0,0,0],["FARIZ","ETERNALS FC",3,0,0,2],["SHADOW WALKER","ETERNALS FC",0,0,0,2],["ALAN","ETERNALS FC",6,1,1,0],["YILDIZZ","ETERNALS FC",5,1,1,0],["NGX - PAREDES","ETERNALS FC",0,0,0,0],["ARN","ETERNALS FC",2,1,0,0],["KROOS","ETERNALS FC",0,0,0,0],["YASEEN","ETERNALS FC",4,0,1,0],["THEJAS","ETERNALS FC",8,2,0,0],["BUNTY","ETERNALS FC",2,0,0,2],["ANVAR","DEMOLISHERS",3,1,0,1],["GUTS","DEMOLISHERS",7,2,0,0],["REXZO","DEMOLISHERS",3,1,0,1],["DAVEEN","DEMOLISHERS",1,1,0,0],["HAADI","DEMOLISHERS",0,0,0,0],["SUBAGLE","DEMOLISHERS",0,0,0,0],["ALFIN","DEMOLISHERS",4,1,0,1],["REHAN","DEMOLISHERS",2,0,1,0],["UMR","DEMOLISHERS",5,2,0,0],["FEAST","DEMOLISHERS",1,0,1,1],["BOKUTO ESP","ESP OLD GODS",6,2,0,0],["BEASTONE ESP","ESP OLD GODS",0,0,1,0],["ABD ESP","ESP OLD GODS",1,0,0,1],["ALTHAF ESP","ESP OLD GODS",0,0,0,0],["SHADHUS ESP","ESP OLD GODS",2,2,0,0],["ASWIN ESP","ESP OLD GODS",0,0,0,0],["KINGSMORT ESP","ESP OLD GODS",6,0,2,0],["MAXPHILL ESP","ESP OLD GODS",5,0,1,1],["NIBIN ESP","ESP OLD GODS",6,1,1,0],["PRANAV ESP","ESP OLD GODS",5,1,1,0],["POKEMON","DOOMSDAY",6,2,0,0],["FGN","DOOMSDAY",4,1,0,0],["STEPHIN","DOOMSDAY",0,0,0,2],["RK","DOOMSDAY",0,0,1,1],["EMMANUEL","DOOMSDAY",7,2,0,0],["JOKER","DOOMSDAY",4,1,0,1],["NJL","DOOMSDAY",4,0,0,2],["VAISRUTH","DOOMSDAY",2,1,0,0],["KOYA","DOOMSDAY",0,0,0,0],["SHAMIL","DOOMSDAY",0,0,0,0],["DEVARSHCK","LEGENDS SYNDICATE ESPORTS",2,0,0,1],["DEEPESH","LEGENDS SYNDICATE ESPORTS",0,0,0,0],["NANDU","LEGENDS SYNDICATE ESPORTS",7,2,0,0],["MATHEW","LEGENDS SYNDICATE ESPORTS",7,1,1,0],["ROHIT","LEGENDS SYNDICATE ESPORTS",4,1,0,1],["VISHAL","LEGENDS SYNDICATE ESPORTS",3,1,0,1],["MOBIN","LEGENDS SYNDICATE ESPORTS",2,0,1,0],["ASWIN","LEGENDS SYNDICATE ESPORTS",2,1,0,0],["HAKEEM","LEGENDS SYNDICATE ESPORTS",3,1,0,0],["SIDHARTH","LEGENDS SYNDICATE ESPORTS",6,2,0,0],["ESP FINISHER","ESP WRAITH",0,0,0,0],["ESP BENI","ESP WRAITH",5,1,1,0],["ESP JACKPOT","ESP WRAITH",3,1,1,0],["ESP MSD","ESP WRAITH",1,0,0,1],["ESP ZENIN","ESP WRAITH",2,0,1,0],["ESP REVIN","ESP WRAITH",1,0,1,0],["ESP SHADOW","ESP WRAITH",2,0,0,1],["ESP CHARLIE","ESP WRAITH",7,2,0,0],["ESP RAMZAN","ESP WRAITH",1,0,0,2],["ESP AKAHAY","ESP WRAITH",3,1,0,1],["DAKSHIN","INFERNO TIGERS",6,2,0,0],["ADHIL","INFERNO TIGERS",0,0,0,0],["ADHI","INFERNO TIGERS",1,0,0,1],["AKHIL","INFERNO TIGERS",3,0,2,0],["JIBIN","INFERNO TIGERS",1,0,0,2],["ROSHAN","INFERNO TIGERS",0,0,0,1],["JAIDEN","INFERNO TIGERS",2,0,0,2],["IYAN","INFERNO TIGERS",4,0,2,0],["DHYAN","INFERNO TIGERS",1,0,1,1],["ALADDIN","INFERNO TIGERS",0,0,0,0],["NAHAL","RSE ULTRAS",0,0,0,0],["RICHU","RSE ULTRAS",0,0,0,0],["SABARI","RSE ULTRAS",2,1,0,0],["ABEL","RSE ULTRAS",4,1,1,0],["IJAS","RSE ULTRAS",3,0,0,2],["SOORAJ","RSE ULTRAS",2,1,0,0],["ELYX","RSE ULTRAS",8,2,0,0],["AJI","RSE ULTRAS",4,0,1,1],["ASHIQ","RSE ULTRAS",2,2,0,0],["KALIDAS","RSE ULTRAS",5,1,1,0],["ADIL","PKC ESPORTS",5,1,1,0],["HARRIS","PKC ESPORTS",3,1,0,1],["ALHYRAN","PKC ESPORTS",6,0,1,1],["LUTHFIN","PKC ESPORTS",1,0,0,1],["MINHAJ","PKC ESPORTS",3,1,0,1],["DANIEL","PKC ESPORTS",1,0,0,1],["RAHUL JALEEL","PKC ESPORTS",1,0,1,0],["SOUMIK","PKC ESPORTS",3,0,0,1],["YAZIR","PKC ESPORTS",0,0,0,1],["ANOOD","PKC ESPORTS",0,0,0,1],["AFSAL","BLACK CAVE JUNIORS",5,2,0,0],["HADIE","BLACK CAVE JUNIORS",6,1,0,1],["YASIR","BLACK CAVE JUNIORS",3,2,0,0],["RAZAL","BLACK CAVE JUNIORS",0,0,0,0],["KUNJU","BLACK CAVE JUNIORS",0,0,0,1],["AMAN","BLACK CAVE JUNIORS",6,2,0,0],["SAHAL","BLACK CAVE JUNIORS",4,1,0,1],["SACHIN","BLACK CAVE JUNIORS",0,0,0,0],["ARJUN","BLACK CAVE JUNIORS",4,1,0,1],["ATHUL","BLACK CAVE JUNIORS",3,0,0,1],["MURSHID","DF CRUISERS",4,1,0,1],["FAYAS","DF CRUISERS",1,0,0,1],["REHOOF","DF CRUISERS",2,0,1,0],["FARHAN","DF CRUISERS",4,2,0,0],["RAHMAN","DF CRUISERS",0,0,0,1],["SHALU","DF CRUISERS",1,0,1,1],["YAACHU","DF CRUISERS",1,0,0,1],["DAANY","DF CRUISERS",2,0,0,2],["DF-LUFFY","DF CRUISERS",0,0,0,0],["AADHIL PWK","DF CRUISERS",3,1,0,1],["SAMIL","UNREAL",0,0,1,1],["FARSEEN","UNREAL",1,0,0,2],["ASHIQ","UNREAL",2,0,2,0],["SAFIL","UNREAL",5,2,0,0],["SARAFAS","UNREAL",3,1,0,0],["NIZAM","UNREAL",0,0,0,1],["NAHIYAN","UNREAL",2,0,0,2],["SUFUYAN","UNREAL",0,0,0,0],["ADHIKRISHNA","UNREAL",0,0,0,0],["SHIBIL","UNREAL",4,0,1,1],["IAM WIZARD","DEFENDING FIGHTERS",1,1,0,0],["ZAAHH","DEFENDING FIGHTERS",4,1,0,0],["ROOKIE","DEFENDING FIGHTERS",0,0,0,0],["NISHAD","DEFENDING FIGHTERS",3,1,0,1],["APRU","DEFENDING FIGHTERS",11,2,0,0],["CARON","DEFENDING FIGHTERS",8,2,0,0],["SANJAY","DEFENDING FIGHTERS",7,2,0,0],["GODRIC","DEFENDING FIGHTERS",10,2,0,0],["AKASH","DEFENDING FIGHTERS",3,2,0,0],["DF -BOSSLADY","DEFENDING FIGHTERS",0,0,0,0],["RISHAD","UNITED FC",0,0,0,1],["MAZIN","UNITED FC",0,0,2,0],["NIHAL","UNITED FC",3,0,1,0],["SAVAD","UNITED FC",2,1,0,1],["SABITH","UNITED FC",3,0,0,2],["ANAS","UNITED FC",4,0,1,1],["RISHAN","UNITED FC",4,0,1,0],["DEVAN","UNITED FC",0,0,0,1],["RIFAN","UNITED FC",0,0,1,0],["SREEHARI","UNITED FC",1,0,0,1],["AATISH","SPARTANS",0,0,0,0],["AADITH","SPARTANS",0,0,0,1],["MISHAL","SPARTANS",2,1,0,0],["SHAHUL","SPARTANS",4,2,0,0],["ARJUN","SPARTANS",10,2,0,0],["SINAN","SPARTANS",2,1,1,0],["ZENX","SPARTANS",4,2,0,0],["NIKA","SPARTANS",1,1,0,0],["YTBHOIRBLUES","SPARTANS",0,0,0,1],["NAVEEN","SPARTANS",1,1,1,0],["ZAYYAN","PROTATHLITES",2,1,0,1],["BRUNO","PROTATHLITES",0,0,1,0],["ANANDHU","PROTATHLITES",3,0,0,1],["ABHISHEK","PROTATHLITES",1,1,0,1],["THASI","PROTATHLITES",4,1,0,1],["GODWIN","PROTATHLITES",4,2,0,0],["JAFIN","PROTATHLITES",2,1,0,0],["KBD","PROTATHLITES",0,0,0,0],["JOEL","PROTATHLITES",4,1,0,1],["ADITH","PROTATHLITES",1,0,0,1],["CMD || KENIFER","CMD AZURAZ",9,2,0,0],["CMD || ASHWATHAMA","CMD AZURAZ",1,0,0,1],["CMD || SHIBIN","CMD AZURAZ",2,0,0,1],["CMD || SOUPTIK","CMD AZURAZ",1,1,0,1],["CMD || ANSHAD","CMD AZURAZ",2,0,1,1],["CMD || RINO","CMD AZURAZ",1,0,0,2],["CMD || ARUN","CMD AZURAZ",0,0,0,0],["CMD || ANIK","CMD AZURAZ",0,0,0,0],["CMD || SAMMY","CMD AZURAZ",5,1,0,1],["CMD || RAJA","CMD AZURAZ",3,0,1,1],["SREEHARI","ELITE SHOWBROS",2,0,1,1],["SHOWBOAT","ELITE SHOWBROS",1,1,0,0],["AMAL","ELITE SHOWBROS",4,1,1,0],["FORLAN","ELITE SHOWBROS",3,1,0,1],["VISHNU","ELITE SHOWBROS",0,0,0,0],["VARKEY","ELITE SHOWBROS",2,0,0,1],["ALAMBRO","ELITE SHOWBROS",2,0,0,2],["DRAGON","ELITE SHOWBROS",0,0,0,1],["BEVIN","ELITE SHOWBROS",0,0,0,1],["ABHISHEK","ELITE SHOWBROS",4,1,0,1],["ATHUL VOK","PWK X ROGUE",2,1,0,0],["ASTA","PWK X ROGUE",0,0,0,1],["JUMAN","PWK X ROGUE",1,0,0,2],["ALEN","PWK X ROGUE",5,2,0,0],["BEECEE","PWK X ROGUE",2,0,0,1],["PRANAV","PWK X ROGUE",7,2,0,0],["MAHFIN","PWK X ROGUE",2,0,2,0],["SHIJIN","PWK X ROGUE",0,0,0,0],["SHIHAS","PWK X ROGUE",3,0,2,0],["ANFAZ","PWK X ROGUE",1,1,0,0],["KAIF","BENFI FC",4,0,0,2],["ASWATH","BENFI FC",0,0,0,1],["RIYAZ","BENFI FC",1,1,0,0],["JAB","BENFI FC",3,0,0,2],["YAHYA","BENFI FC",1,0,0,1],["IRFAN","BENFI FC",1,0,0,1],["RONALDO","BENFI FC",0,0,0,0],["SAHEED","BENFI FC",7,1,0,1],["RAHMAN","BENFI FC",0,0,0,2],["SALMAN","BENFI FC",3,0,0,2],["ASWIN","PWK ASCENDED",2,1,0,1],["IBRU","PWK ASCENDED",6,1,0,1],["KENZ","PWK ASCENDED",3,1,0,0],["VYSHNAV","PWK ASCENDED",2,0,1,0],["SINAN","PWK ASCENDED",0,0,0,0],["PRANAV","PWK ASCENDED",3,2,0,0],["SRIJITH","PWK ASCENDED",3,2,0,0],["JUDE","PWK ASCENDED",6,1,0,1],["NIZAL","PWK ASCENDED",0,0,0,1],["KAUSHIK","PWK ASCENDED",3,1,0,0]];
+const players = DATA.map(r => ({ name: r[0], team: r[1], goals: r[2], wins: r[3], draws: r[4], losses: r[5],
+  played: r[3] + r[4] + r[5], pts: 3 * r[3] + r[4] }));
+let view = "goals", q = "", team = "";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const teams = Array.from(new Set(players.map(p => p.team))).sort((a, b) => a.localeCompare(b));
+$("team").insertAdjacentHTML("beforeend", teams.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(""));
+
+function ranked() {
+  const list = players.slice().sort(view === "goals"
+    ? (a, b) => b.goals - a.goals || a.played - b.played || a.name.localeCompare(b.name)
+    : (a, b) => b.pts - a.pts || b.wins - a.wins || b.goals - a.goals || a.name.localeCompare(b.name));
+  let rank = 0, prev = null;
+  list.forEach((p, i) => {
+    const key = view === "goals" ? p.goals + "/" + p.played : p.pts + "/" + p.wins + "/" + p.goals;
+    if (key !== prev) { rank = i + 1; prev = key; }
+    p.rank = rank;
+  });
+  return list;
+}
+
+function render() {
+  const list = ranked();
+  const mv = p => view === "goals" ? p.goals : p.pts;
+  const max = Math.max(1, ...list.map(mv));
+  const totG = list.reduce((s, p) => s + p.goals, 0);
+  const totW = list.reduce((s, p) => s + p.wins, 0), totD = list.reduce((s, p) => s + p.draws, 0);
+  $("summary").innerHTML = `<b>${list.length}</b> players · ` + (view === "goals"
+    ? `<b>${totG}</b> ${totG === 1 ? "goal" : "goals"} scored`
+    : `<b>${totW}</b> ${totW === 1 ? "win" : "wins"} · <b>${totD}</b> ${totD === 1 ? "draw" : "draws"} recorded`);
+  $("foot").textContent = view === "goals"
+    ? "Ranked by goals. Players level on goals are ordered by fewer matches played, then by name. This page shows results up to " + "27 Nov 2026" + "."
+    : "Best Player is ranked by points: 3 for a win, 1 for a draw, 0 for a loss. Players level on points are ordered by wins, then goals scored, then name. This page shows results up to " + "27 Nov 2026" + ".";
+  const term = q.trim().toLowerCase();
+  const shown = list.filter(p => (!team || p.team === team) && (!term || (p.name + " " + p.team).toLowerCase().includes(term)));
+  if (!shown.length) { $("board").innerHTML = '<li class="empty">No player matches that search.</li>'; return; }
+  $("board").innerHTML = shown.map(p => {
+    const v = mv(p);
+    const sub = [p.team, view === "goals" ? p.played + " played" : p.played + " played · " + p.wins + "W " + p.draws + "D " + p.losses + "L"].map(esc).join(" · ");
+    const cls = "item" + (p.rank <= 3 && v > 0 ? " podium" : "") + (p.rank === 1 && v > 0 ? " leader" : "");
+    const tag = p.rank === 1 && v > 0 ? '<span class="tag">' + (view === "goals" ? "Golden Boot" : "Best Player") + "</span>" : "";
+    const unit = view === "goals" ? (v === 1 ? "goal" : "goals") : (v === 1 ? "point" : "points");
+    return `<li class="${cls}"><div class="rank">${p.rank}</div>
+      <div><div class="name">${esc(p.name)}${tag}</div><div class="sub">${sub}</div>
+      <div class="meter"><i style="width:${Math.round(v / max * 100)}%"></i></div></div>
+      <div class="goals"><b>${v}</b><small>${unit}</small></div></li>`;
+  }).join("");
+}
+
+document.querySelector(".tabs").addEventListener("click", e => {
+  const t = e.target.closest(".tab");
+  if (!t) return;
+  view = t.dataset.view;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b === t)));
+  render();
+});
+$("q").addEventListener("input", e => { q = e.target.value; render(); });
+$("team").addEventListener("change", e => { team = e.target.value; render(); });
+render();
+</script>
+
+</body></html>
